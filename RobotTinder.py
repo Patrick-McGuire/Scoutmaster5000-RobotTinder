@@ -10,13 +10,14 @@ import scipy.sparse.linalg
 import sparse
 import sys
 
+
 def build_from_dense(A, alpha, l0, l1):
     n = A.shape[0]
     k_in = np.sum(A, 0)
     k_out = np.sum(A, 1)
 
-    D1 = k_in + k_out           # to be seen as diagonal matrix, stored as 1d array
-    D2 = l1 * (k_out - k_in)    # to be seen as diagonal matrix, stored as 1d array
+    D1 = k_in + k_out  # to be seen as diagonal matrix, stored as 1d array
+    D2 = l1 * (k_out - k_in)  # to be seen as diagonal matrix, stored as 1d array
 
     if alpha != 0.:
         B = np.ones(n) * (alpha * l0) + D2
@@ -36,11 +37,11 @@ def build_from_dense(A, alpha, l0, l1):
 
 def build_from_sparse(A, alpha, l0, l1):
     n = A.shape[0]
-    k_in = np.sum(A, 0).A1      # convert matrix of shape (1, n) into 1-dimensional array
-    k_out = np.sum(A, 1).A1     # same with (n, 1) matrix
+    k_in = np.sum(A, 0).A1  # convert matrix of shape (1, n) into 1-dimensional array
+    k_out = np.sum(A, 1).A1  # same with (n, 1) matrix
 
-    D1 = k_in + k_out           # to be seen as diagonal matrix, stored as 1d array
-    D2 = l1 * (k_out - k_in)    # to be seen as diagonal matrix, stored as 1d array
+    D1 = k_in + k_out  # to be seen as diagonal matrix, stored as 1d array
+    D2 = l1 * (k_out - k_in)  # to be seen as diagonal matrix, stored as 1d array
 
     if alpha != 0.:
         B = np.ones(n) * (alpha * l0) + D2
@@ -49,16 +50,16 @@ def build_from_sparse(A, alpha, l0, l1):
         A = A.tolil(copy=False)
         A.setdiag(alpha + D1 + A.diagonal())
     else:
-        last_row_plus_col = sparse.COO.from_scipy_sparse(A[n - 1, :] + A[:, n - 1].T)   # create sparse 1d COO array
+        last_row_plus_col = sparse.COO.from_scipy_sparse(A[n - 1, :] + A[:, n - 1].T)  # create sparse 1d COO array
         A = A + A.T
 
-        A += last_row_plus_col                                                          # broadcast on rows
-        A = -A.tocsr()                                                                  # reconvert to csr scipy matrix
+        A += last_row_plus_col  # broadcast on rows
+        A = -A.tocsr()  # reconvert to csr scipy matrix
         with warnings.catch_warnings():
             warnings.simplefilter("ignore", scipy.sparse.SparseEfficiencyWarning)
             A.setdiag(A.diagonal() + D1)
 
-        D3 = np.ones(n) * (l1 * (k_out[n-1] - k_in[n-1]))    # to be seen as diagonal matrix, stored as 1d array
+        D3 = np.ones(n) * (l1 * (k_out[n - 1] - k_in[n - 1]))  # to be seen as diagonal matrix, stored as 1d array
         B = D2 + D3
 
     return A, B
@@ -103,6 +104,7 @@ def SpringRank(A, alpha=0., l0=1., l1=1., solver='bicgstab', verbose=False, forc
 
     return rank
 
+
 pitScoutData = ""
 matchData = ""
 dataIn = ""
@@ -114,6 +116,7 @@ comparisonsData = []
 ranks = []
 trueRanks = []
 teams = []
+
 
 def getData(link):
     global pitScoutData, dataIn, matchData, teams
@@ -131,6 +134,7 @@ def getData(link):
     ms = [i for i in ms if i]
     teams = list({x for i in ms for x in i})
     teams.sort(key=int)
+
 
 html = r'''<!doctype html>
 <html lang="en">
@@ -204,11 +208,11 @@ html = r'''<!doctype html>
     imgLinkSTR = AimgLinkSTR
     pitDataSTR = ApitDataSTR
   }
-  
+
   function getPitData() {
     return pitDataSTR.split(stringSeparator2)
   }
-  
+
   function getImgLinks() {
     var rawData = imgLinkSTR.split(stringSeparator2)
     var imgLinks = []
@@ -244,8 +248,8 @@ html = r'''<!doctype html>
     }
     return ""
   }
-  
-  
+
+
   function getCustomDataConfig() {
     var rawData = customConfigDataSTR.split(stringSeparator2)
     var matchSchedule = []
@@ -261,7 +265,7 @@ html = r'''<!doctype html>
     for(var i = 0; i < rawData.length; i++) {  teamLookupConfig.push(rawData[i].split(stringSeparator1)) }
     return removeEmptyDataFrom2DArray(teamLookupConfig)
   }
-  
+
   function getPitScoutHTMLTable(team, pitData) {
     var html = '<table class="table"><tr class="tableAA"><th class="tableAA">Drive Train</th><th class="tableAA">Wheels #:</th>'
     html += '<th tableAA="table">Motor Type:</th><th tableAA="tableAA">Motor #:</th><th class="tableAA">Comments:</th></tr><tr class="table">'
@@ -272,7 +276,7 @@ html = r'''<!doctype html>
     html += '<td class="table">' + getPitDatapoint(pitData, team, "comments") + '</td></tr></table>'
     return html
   }
-  
+
   function getTeamLookupHTML(team) {
     var configData = getCustomDataConfig()
     var scoutingData = getMatchData()
@@ -289,7 +293,7 @@ html = r'''<!doctype html>
       }
     }
 
-    
+
     var htmlTable = '<table class="teamLookupTable">'
     for(var i = 0; i < compiledDataPoints.length / rowsNum; i++) {
       htmlTable += '<tr class="teamLookupTable">'
@@ -320,7 +324,7 @@ html = r'''<!doctype html>
      return getImgLinkHTML(getImgLinks(), team) + '<br><br>' + getPitScoutHTMLTable(team, getPitData()) + htmlTable
      // return getImgLinkHTML(getImgLinks(), team) + '<br><br>' + getPitScoutHTMLTable(team, getPitData()) + htmlTable
   }
-  
+
   function getPitDatapoint(data, team, datapoint) {
     for(var i = 0; i < data.length; i++) {
       var json = JSON.parse(data[i])
@@ -330,7 +334,7 @@ html = r'''<!doctype html>
     }
     return 'error'
   }
-  
+
   function getDatapoint(team, datapoint, isAv) {
     var scoutingData = getMatchData()
     var configData = getCustomDataConfig()
@@ -369,7 +373,7 @@ html = r'''<!doctype html>
             matchesList.push(matchNum)
             text = ""
           }
-            
+
         }
       }
     }
@@ -395,7 +399,7 @@ app = QApplication(sys.argv)
 win = QWidget()
 layout = QGridLayout()
 rankDisplayScroll = QScrollArea()
-rankDisplayScroll.setFixedWidth(int(app.primaryScreen().size().width()/9))
+rankDisplayScroll.setFixedWidth(int(app.primaryScreen().size().width() / 9))
 rankDisplayLayout = QGridLayout()
 
 top = QWidget()
@@ -436,14 +440,17 @@ topLayout.addWidget(row2, 1, 0)
 topLayout.setAlignment(Qt.AlignTop)
 top.setLayout(topLayout)
 
+
 def submitLink():
     global linkEntry
     if linkEntry.text() == "":
         return
     getData(linkEntry.text() + "?data={}")
     linkEntry.clear()
-    web.page().runJavaScript("setData(String.raw`{0}`, String.raw`{1}`, String.raw`{2}`, String.raw`{3}`, String.raw`{4}`)".format(dataIn[1], matchData, dataIn[4], dataIn[6], pitScoutData))
+    web.page().runJavaScript(
+        "setData(String.raw`{0}`, String.raw`{1}`, String.raw`{2}`, String.raw`{3}`, String.raw`{4}`)".format(dataIn[1], matchData, dataIn[4], dataIn[6], pitScoutData))
     createPage()
+
 
 def createPage():
     global web, team1, team2
@@ -451,6 +458,7 @@ def createPage():
     web.page().runJavaScript("createTables('{0}', '{1}')".format(team1STR, team2STR))
     team1.setText(team1STR)
     team2.setText(team2STR)
+
 
 def getTeams(dataInIn):
     out = []
@@ -461,8 +469,10 @@ def getTeams(dataInIn):
     out.sort()
     return out
 
+
 def Diff(li1, li2):
     return list(list(set(li1) - set(li2)) + list(set(li2) - set(li1)))
+
 
 def saveFile():
     try:
@@ -476,6 +486,7 @@ def saveFile():
     except Exception as e:
         print(e)
 
+
 def displayRank():
     text = ""
     revRanks = list(trueRanks)
@@ -487,8 +498,25 @@ def displayRank():
         text = text + "\n"
     rankDisplayWidget.setText(text)
 
+
+def correctComparisonsData(incList):
+    new_list = [list(element) for element in list(set([frozenset(element) for element in incList]))]
+    for i in new_list:
+        if len(i) < 2:
+            new_list.remove(i)
+    return new_list
+
+
+def unorderedInList(refList, unordered):
+    for i in refList:
+        if set(i) == set(unordered):
+            return True
+    return False
+
+
 def getNextTeams():
-    global team1STR, team2STR
+    global team1STR, team2STR, comparisonsData
+    # comparisonsData = correctComparisonsData(comparisonsData)
     if len(comparisonsData) > 0:
         calculateRanks()
     teamToChooseFrom = list(map(str, Diff(list(map(int, teams)), getTeams(comparisonsData))))
@@ -537,6 +565,7 @@ def getNextTeams():
         if len(teamToChooseFrom) == 1:
             team2STR = teamToChooseFrom[0]
 
+
     else:
         print("Teams that have not been chosen: ", end="")
         print(teamToChooseFrom)
@@ -546,6 +575,13 @@ def getNextTeams():
             if not ranTeam == team1STR:
                 team2STR = ranTeam
                 break
+
+    while unorderedInList(comparisonsData, [int(team1STR), int(team2STR)]):
+        print("Error: Chose existing pair of teams")
+        team1STR = str(random.choice(teams))
+        team2STR = str(random.choice(teams))
+        while team1STR == team2STR:
+            team2STR = str(random.choice(teams))
 
 
 def calculateRanks():
@@ -571,7 +607,7 @@ def calculateRanks():
         ranks = []
         for ii in rankTeams:
             if i != 0 and last == ii[0]:
-                ranks[i-1].append(ii[1])
+                ranks[i - 1].append(ii[1])
             else:
                 ranks.append([ii[1]])
                 i = i + 1
@@ -587,20 +623,24 @@ def calculateRanks():
 
 def submitTeam1():
     submitTeam(team1STR, team2STR)
+
+
 def submitTeam2():
     submitTeam(team2STR, team1STR)
+
+
 def submitTeam(betterTeam, worseTeam):
     if team1STR == "" or team2STR == "":
         return
     comparisonsData.append([int(betterTeam), int(worseTeam)])
     createPage()
 
+
 openFile = QFileDialog.getOpenFileName()
 if openFile[0] != "":
     openedFile = open(openFile[0], 'r')
     Lines = openedFile.readlines()
     for i in Lines:
-
         comparisonsData.append(list(map(int, i.replace("\n", "").split(">"))))
 
 print(comparisonsData)
@@ -611,11 +651,10 @@ team1.clicked.connect(submitTeam1)
 team2.clicked.connect(submitTeam2)
 saveFileButton.clicked.connect(saveFile)
 
-web.setFixedHeight(int(app.primaryScreen().size().height()*.75))
+web.setFixedHeight(int(app.primaryScreen().size().height() * .75))
 leftLayout.addWidget(top, 0, 0)
 leftLayout.addWidget(web, 2, 0)
 left.setLayout(leftLayout)
-
 
 layout.addWidget(left, 0, 0)
 layout.addWidget(rankDisplayScroll, 0, 1)
