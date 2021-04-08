@@ -413,7 +413,7 @@ row2Layout = QGridLayout()
 
 web = QWebEngineView()
 linkEntry = QLineEdit()
-linkEntry.setText("https://script.google.com/macros/s/AKfycbzbVJ03rdYPL7VORjsFZgu6AU4UnLAGrPAgFeCzBJoAOqnA3C4rf1JX/exec")
+# linkEntry.setText("https://script.google.com/macros/s/AKfycbzbVJ03rdYPL7VORjsFZgu6AU4UnLAGrPAgFeCzBJoAOqnA3C4rf1JX/exec")
 submit = QPushButton("Enter Link", win)
 rankDisplayWidget = QTextEdit()
 saveFileButton = QPushButton("Save")
